@@ -1,9 +1,7 @@
 function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_000, ϵ_constraint = 1e-4, ϵ_λ = 1e-4, μ_rate = 1.05, verbose = false)
-
-    D = length(x)
-
     
-    split(xext) = xext[1:D], exp(xext[end])
+    
+    split(xext) = xext[1:end-1], exp(xext[end])
 
     merge(x,s) = [x; log(s)]
 
@@ -14,7 +12,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
         local x, s = split(x_ext)
         
-        f(x) + λ*g(x) + (μ/2) * (g(x) + s)^2
+        f(x) + λ*(g(x) + s) + (μ/2) * (g(x) + s)^2
 
     end
 
