@@ -1,4 +1,4 @@
-function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_000, ϵ_constraint = 1e-3, ϵ_λ = 1e-4, μ_rate = 1.05, verbose = false)
+function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_000, ϵ_constraint = 1e-4, ϵ_λ = 1e-4, μ_rate = 1.05, verbose = false)
 
     D = length(x)
 
@@ -7,7 +7,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
     merge(x,s) = [x; log(s)]
 
-    opt = Optim.Options(iterations = inneriterations, show_trace = false, show_every = 1)
+    opt = Optim.Options(iterations = inneriterations, show_trace = false, show_every = 1, g_tol = 1e-8)
 
     
     function Lₐ(x_ext; λ = λ, μ = μ) # minimise augmented Lagrange objective
@@ -40,7 +40,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
     iteration = 1
 
-    
+
     while ~converged && iteration <= maxiterations
 
         x_ext, converged = minimise_Lₐ(x_ext; λ = λ, μ = μ)
@@ -74,7 +74,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
         converged = converged && abs(λprv - λ) < ϵ_λ          # check if the Lagrange multipliers converge
 
-        converged = converged && abs(s * λ) < 1e-6            # complementary slackness
+        # converged = converged && abs(s * λ) < 1e-3            # complementary slackness
 
         iteration += 1
 
