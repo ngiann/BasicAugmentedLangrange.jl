@@ -25,7 +25,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
         local res = optimize(helper, x_ext, LBFGS(), opt, autodiff=:forward)
 
-        Optim.minimizer(res), Optim.converged(res)
+        Optim.minimizer(res), Optim.converged(res), Optim.minimum(res)
         
     end
 
@@ -43,7 +43,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
     while ~converged && iteration <= maxiterations
 
-        x_ext, converged = minimise_Lₐ(x_ext; λ = λ, μ = μ)
+        x_ext, converged, _ = minimise_Lₐ(x_ext; λ = λ, μ = μ)
 
         x, s = split(x_ext)
 
