@@ -14,7 +14,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
         local x, s = split(x_ext)
         
-        f(x) + λ*g(x) + (μ/2) * (g(x) - s)^2
+        f(x) + λ*g(x) + (μ/2) * (g(x) + s)^2
 
     end
 
