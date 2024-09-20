@@ -16,8 +16,7 @@ function optimise(f, g, x; iterations = 1, inneriterations = 1000)
     end
 
 
-    λ, ρ = 1e-1, 1e4 # initial values
-
+    λ, ρ = 1e-3, 1.0 # initial values
 
     for i in 1:iterations # this is algorithm 1 in paper
 
@@ -25,10 +24,10 @@ function optimise(f, g, x; iterations = 1, inneriterations = 1000)
 
         λ = max(0, λ + (1/ρ)*g(x))
 
-        if g(x) <= 0.0 
-           # do nothing, ρ = ρ
-        else
-           ρ = 0.5*ρ
+        if g(x) > 0.0 
+           
+            ρ = max(0.99*ρ, 1e-6)
+
         end
 
         @printf("iterations %d: λ = %.6f, ρ = %.6f, g(x) = %.4f, Lₐ =  %.6f\n", i, λ, ρ, g(x), Lₐ(x; λ = λ, ρ = ρ))
