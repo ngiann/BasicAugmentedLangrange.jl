@@ -1,7 +1,7 @@
 name = "BasicAugmentedLangrange"
 uuid = "afcdd506-c292-4d2d-8178-f26d054b8ebe"
 authors = ["Nikos Gianniotis <ngiann@gmail.com> and contributors"]
-version = "1.0.0-DEV"
+version = "1.0.1-DEV"
 
 [deps]
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
