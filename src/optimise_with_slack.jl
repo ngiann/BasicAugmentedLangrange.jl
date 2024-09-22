@@ -1,4 +1,4 @@
-function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_000, ϵ_constraint = 1e-4, ϵ_λ = 1e-4, μ_rate = 1.05, verbose = false, backend = AutoForwardDiff(chunksize=16))
+function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_000, ϵ_constraint = 1e-4, ϵ_λ = 1e-4, ρ_rate = 1.05, verbose = false, backend = AutoForwardDiff(chunksize=16))
     
     
     split(xext) = xext[1:end-1], exp(xext[end])
@@ -8,18 +8,18 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
     opt = Optim.Options(iterations = inneriterations, show_trace = false, show_every = 1, g_tol = 1e-8)
 
     
-    function Lₐ(x_ext; λ = λ, μ = μ) # minimise augmented Lagrange objective
+    function Lₐ(x_ext; λ = λ, ρ = ρ) # minimise augmented Lagrange objective
 
         local x, s = split(x_ext)
         
-        f(x) + λ*(g(x) + s) + (μ/2) * (g(x) + s)^2
+        f(x) + λ*(g(x) + s) + (ρ/2) * (g(x) + s)^2
 
     end
 
 
-    function minimise_Lₐ(x_ext; λ = λ, μ = μ)
+    function minimise_Lₐ(x_ext; λ = λ, ρ = ρ)
 
-        local helper(x′) = Lₐ(x′; λ = λ, μ = μ) # fix λ, μ and minimise
+        local helper(x′) = Lₐ(x′; λ = λ, ρ = ρ) # fix λ, ρ and minimise
 
         gradhelper!(s, p) = copyto!(s, DifferentiationInterface.gradient(helper, backend, p))
 
@@ -30,7 +30,7 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
     end
 
 
-    λ, μ, s = 1e-3, 1e-3, 1e-3 # initial values
+    λ, ρ, s = 1e-3, 1e-3, 1e-3 # initial values
 
     x_ext = merge(x, s)
 
@@ -43,25 +43,25 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
     while ~converged && iteration <= maxiterations
 
-        x_ext, converged, _ = minimise_Lₐ(x_ext; λ = λ, μ = μ)
+        x_ext, converged, _ = minimise_Lₐ(x_ext; λ = λ, ρ = ρ)
 
         x, s = split(x_ext)
 
         λprv = λ
 
-        λ = λ + μ*(g(x) + s)
+        λ = λ + ρ*(g(x) + s)
 
 
         if g(x) + s > ϵ_constraint # if constrained violated, increase penalty
            
-            μ = min(μ_rate*μ, 1e6)
+            ρ = min(ρ_rate*ρ, 1e6)
 
         end
 
 
         if verbose 
 
-            @printf("(%d): λ = %.6f, μ = %.6f, s = %.6f, g(x) = %.4f, Lₐ =  %.6f\n", iteration, λ, μ, s, g(x), Lₐ(x_ext; λ = λ, μ = μ))
+            @printf("(%d): λ = %.6f, ρ = %.6f, s = %.6f, g(x) = %.4f, Lₐ =  %.6f\n", iteration, λ, ρ, s, g(x), Lₐ(x_ext; λ = λ, ρ = ρ))
 
         end
 
@@ -80,6 +80,6 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
     end
 
-    return minimise_Lₐ(x_ext; λ = λ, μ = μ)
+    return minimise_Lₐ(x_ext; λ = λ, ρ = ρ)
 
 end
