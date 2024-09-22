@@ -1,6 +1,6 @@
 module BasicAugmentedLangrange
 
-    using LinearAlgebra, Optim, Random, Printf, ForwardDiff
+    using LinearAlgebra, Optim, Random, Printf, ForwardDiff, DifferentiationInterface
 
     include("optimise.jl")
 
