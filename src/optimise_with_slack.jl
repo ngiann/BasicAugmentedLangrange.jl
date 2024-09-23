@@ -1,4 +1,4 @@
-function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_000, ϵ_constraint = 1e-4, ϵ_λ = 1e-4, ρ_rate = 1.05, verbose = false, backend = AutoForwardDiff(chunksize=16))
+function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 100_000, ϵ_constraint = 1e-4, ϵ_λ = 1e-4, ρ_rate = 1.05, verbose = false, backend = AutoForwardDiff(chunksize=16))
     
     
     split(xext) = xext[1:end-1], exp(xext[end])
@@ -21,9 +21,11 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 10_
 
         local helper(x′) = Lₐ(x′; λ = λ, ρ = ρ) # fix λ, ρ and minimise
 
-        gradhelper!(s, p) = copyto!(s, DifferentiationInterface.gradient(helper, backend, p))
+        # gradhelper!(s, p) = copyto!(s, DifferentiationInterface.gradient(helper, backend, p))
 
-        local res = optimize(helper, gradhelper!, x_ext, LBFGS(), opt)
+        # local res = optimize(helper, gradhelper!, x_ext, LBFGS(), opt)
+
+        local res = optimize(helper, x_ext, NelderMead(), opt) # ❗ This is temporary. Comment back in the two lines above ❗
 
         Optim.minimizer(res), Optim.converged(res), Optim.minimum(res)
         
