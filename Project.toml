@@ -1,7 +1,7 @@
 name = "BasicAugmentedLangrange"
 uuid = "afcdd506-c292-4d2d-8178-f26d054b8ebe"
 authors = ["Nikos Gianniotis <ngiann@gmail.com> and contributors"]
-version = "1.0.3-DEV"
+version = "1.0.4-DEV"
 
 [deps]
 DifferentiationInterface = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
