@@ -21,11 +21,9 @@ function optimise_with_slack(f, g, x; maxiterations = Inf, inneriterations = 100
 
         local helper(x′) = Lₐ(x′; λ = λ, ρ = ρ) # fix λ, ρ and minimise
 
-        # gradhelper!(s, p) = copyto!(s, DifferentiationInterface.gradient(helper, backend, p))
+        gradhelper!(s, p) = copyto!(s, DifferentiationInterface.gradient(helper, backend, p))
 
-        # local res = optimize(helper, gradhelper!, x_ext, LBFGS(), opt)
-
-        local res = optimize(helper, x_ext, NelderMead(), opt) # ❗ This is temporary. Comment back in the two lines above ❗
+        local res = optimize(helper, gradhelper!, x_ext, LBFGS(), opt)
 
         Optim.minimizer(res), Optim.converged(res), Optim.minimum(res)
         
